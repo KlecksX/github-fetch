@@ -20,7 +20,7 @@ app.use(function(req, res, next) {
 	hmac.update(JSON.stringify(req.body));
 	calculatedSignature = 'sha1=' + hmac.digest('hex');
 
-	if (crypto.timingSafeEqual(req.headers['x-hub-signature'], calculatedSignature)) {
+	if (crypto.timingSafeEqual(Buffer.from(req.headers['x-hub-signature']), Buffer.from(calculatedSignature))) {
 		next();
 	} else {
 		console.log("Bad singature on this request: " + req.headers['x-hub-signature']);
