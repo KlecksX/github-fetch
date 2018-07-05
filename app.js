@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const { exec } = require('child_process');
 
 app = express();
+PORT = 3000;
 
 // configure the app to use bodyParser()
 app.use(bodyParser.urlencoded({
@@ -46,9 +47,12 @@ app.post('/payload', function(req, res) {
 	//If the pusher is known.
 	if (req.body.pusher && req.body.pusher.name && req.body.pusher.email) {
 		console.log(req.body.pusher.name + " (" + req.body.pusher.email + ") has pushed to master branch:");
+		
+		//Log the commit message if available
 		if(req.body.commits.length > 0) {
 			console.log('"' + req.body.commits[0].message + '"');
 		}
+		
 		//Fetch, Build and run the project
 		exec("sublime ~/Work/klecksx/capacitor-lock", function(error, stdout, stderr) {
 			if (error) {
@@ -61,10 +65,10 @@ app.post('/payload', function(req, res) {
 		return res.sendStatus(200);
 	}
 
-	res.status(400).send("Request body is lacking the pusher object or it's name or email attribute.");
+	res.status(400).send("Request body is lacking a valid pusher object.");
 
 });
 
-app.listen(3000);
+app.listen(PORT);
 
-console.log("GitHub Fetcher is now waiting for changes to the repo.");
+console.log("GitHub Fetcher is waiting for webhook calls on port " + PORT);
