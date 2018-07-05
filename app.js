@@ -1,5 +1,7 @@
-var express = require('express')
-var bodyParser = require('body-parser')
+var express = require('express');
+var bodyParser = require('body-parser');
+
+const { exec } = require('child_process');
 
 app = express();
 
@@ -25,11 +27,18 @@ app.post('/payload', function(req, res) {
 	}
 
 	if (req.body.pusher && req.body.pusher.name && req.body.pusher.email) {
-		console.log(req.body.pusher.name + " (" + req.body.pusher.email + ") has pushed to master:");
+		console.log(req.body.pusher.name + " (" + req.body.pusher.email + ") has pushed to master branch:");
 		if(req.body.commits.length > 0) {
-			console.log(req.body.commits[0].message);
+			console.log('"' + req.body.commits[0].message + '"');
 		}
-		//rebuild and restart
+		exec("sublime ~/Work/klecksx/capacitor-lock", function(err, stdout, stderr) {
+			if (error) {
+		    console.error(`exec error: ${error}`);
+		    return;
+		  }
+		  console.log(`stdout: ${stdout}`);
+		  console.log(`stderr: ${stderr}`);
+		});
 		return res.sendStatus(200);
 	}
 
