@@ -26,6 +26,9 @@ app.post('/payload', function(req, res) {
 
 	if (req.body.pusher && req.body.pusher.name && req.body.pusher.email) {
 		console.log(req.body.pusher.name + " (" + req.body.pusher.email + ") has pushed to master:");
+		if(req.body.commits.length > 0) {
+			console.log(req.body.commits[0].message);
+		}
 		//rebuild and restart
 		return res.sendStatus(200);
 	}
