@@ -31,7 +31,7 @@ app.post('/payload', function(req, res) {
 		if(req.body.commits.length > 0) {
 			console.log('"' + req.body.commits[0].message + '"');
 		}
-		exec("sublime ~/Work/klecksx/capacitor-lock", function(err, stdout, stderr) {
+		exec("sublime ~/Work/klecksx/capacitor-lock", function(error, stdout, stderr) {
 			if (error) {
 		    console.error(`exec error: ${error}`);
 		    return;
