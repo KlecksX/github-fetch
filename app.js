@@ -19,8 +19,19 @@ app.get('/payload', function(req, res) {
 });
 
 app.post('/payload', function(req, res) {
-	console.log(req.body);
-	res.sendStatus(200);
+	
+	if (req.body.ref !== "refs/heads/master") {
+		return res.send("Push was not to master branch. Will be ignored.");
+	}
+
+	if (req.body.pusher && req.body.pusher.name && req.body.pusher.email) {
+		console.log(req.body.pusher.name + " (" + req.body.pusher.email + ") has pushed to master:");
+		//rebuild and restart
+		return res.sendStatus(200);
+	}
+
+	res.status(400).send("Request body is lacking the pusher object or it's name or email attribute.");
+
 });
 
 app.listen(3000);
