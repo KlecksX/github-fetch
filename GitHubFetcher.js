@@ -1,5 +1,3 @@
-"use strict";
-
 const crypto = require('crypto');
 const { exec } = require('child_process');
 
@@ -47,6 +45,7 @@ module.exports = class GitHubFetcher {
 				console.log('Commit: "' + req.body.commits[0].message + '"');
 			}
 
+			console.log(this);
 			var that = this;
 
 			//Clone the project to this.localRepoTarget
