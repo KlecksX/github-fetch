@@ -40,15 +40,15 @@ module.exports = class GitHubFetcher {
 		if (typeof options == 'undefined') options = {};
 		if (!options.repoAddress) throw new Exception('No repoAddress defined.');
 		if (!options.buildCommands) options.buildCommands = new Array();
-		if (!options.localRepoTarget) options.localRepoTarget = '~/test';
+		if (!options.localRepoTarget) options.localRepoTarget = 'test';
 
 		var execCallback = function (error, stdout, stderr) {
 			if (error) {
 		    console.error(`exec error: ${error}`);
 		    return;
 		  }
-		  console.log(`stdout: ${stdout}`);
-		  console.log(`stderr: ${stderr}`);
+		  if (stdout) console.log(`stdout: ${stdout}`);
+		  if (stderr) console.log(`stderr: ${stderr}`);
 		}
 		
 		/**
@@ -69,8 +69,8 @@ module.exports = class GitHubFetcher {
 					console.log('Commit: "' + req.body.commits[0].message + '"');
 				}
 
-				//Clone the project to this.localRepoTarget
-				exec('git clone ' + options.repoAddress + ' ' + options.localRepoTarget, execCallback);
+				//Clone the project to -C ~/*this.localRepoTarget*
+				exec('git clone -C ~/' + options.repoAddress + ' ' + options.localRepoTarget, execCallback);
 
 				//Execute user defined commands
 				for (var i=0; i<options.buildCommands.length; i++) {
