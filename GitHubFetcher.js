@@ -8,7 +8,8 @@ module.exports = class GitHubFetcher {
 	constructor(repoAddress) {
 		this.repoAddress = repoAddress;
 		this.buildCommands = new Array();
-		this.localRepoTarget = 'test';
+		this.localRepoTarget = 'test-target';
+		this.secret = process.env.GITHUB_SECRET || 'test-secret';
 	}
 
 	/**
@@ -45,7 +46,7 @@ module.exports = class GitHubFetcher {
 			if(req.body.commits.length > 0) {
 				console.log('Commit: "' + req.body.commits[0].message + '"');
 			}
-			
+
 			var that = this;
 
 			//Clone the project to this.localRepoTarget

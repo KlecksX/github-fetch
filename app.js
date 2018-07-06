@@ -10,7 +10,7 @@ const GitHubFetcher = require('./GitHubFetcher');
 
 var app = express();
 var githubFetcher = new GitHubFetcher('https://github.com/KlecksX/github-fetch.git');
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // configure the app to use bodyParser()
 app.use(bodyParser.urlencoded({
