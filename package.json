@@ -2,8 +2,9 @@
   "name": "github-fetcher",
   "version": "1.0.0",
   "description": "This node app provides a webhook to github and fetches and runs the master branch whenever changes are made to it on GitHub",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "test": "test"
   },
   "author": "Vincent Jeltsch",
