@@ -8,7 +8,7 @@ module.exports = class GitHubFetcher {
 	constructor(repoAddress) {
 		this.repoAddress = repoAddress;
 		this.buildCommands = new Array();
-		this.repoPath = 'test';
+		this.localRepoTarget = 'test';
 	}
 
 	/**
@@ -46,8 +46,8 @@ module.exports = class GitHubFetcher {
 				console.log('Commit: "' + req.body.commits[0].message + '"');
 			}
 			
-			//Clone the project
-			exec('git clone' + this.repoAddress + ' ' + this.repoPath, execCallback);
+			//Clone the project to this.localRepoTarget
+			exec('git clone' + this.repoAddress + ' ' + this.localRepoTarget, execCallback);
 
 			//Execute user defined commands
 			for (var i=0; i<this.buildCommands.length; i++) {
