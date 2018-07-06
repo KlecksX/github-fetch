@@ -2,6 +2,7 @@
 
 const crypto = require('crypto');
 const { exec } = require('child_process');
+const fs = require('fs');
 
 module.exports = class GitHubFetcher {
 
@@ -50,6 +51,16 @@ module.exports = class GitHubFetcher {
 		  if (stdout) console.log(`stdout: ${stdout}`);
 		  if (stderr) console.log(`stderr: ${stderr}`);
 		}
+
+		console.log('Trying to clone the repo. This will fail if the repo has already exists on this machine.')
+		console.log('Executing: git clone ' + options.repoAddress + ' ~/' + options.localRepoTarget);
+		exec('git clone ' + options.repoAddress + ' ~/' + options.localRepoTarget, execCallback);
+		
+		//Execute user defined commands
+		console.log('Executing user defined commands.');
+		for (var i=0; i<options.buildCommands.length; i++) {
+			exec(options.buildCommands[i], execCallback);
+		}
 		
 		/**
 	 	 * This function validates the request body, clones the current master branch, executes custom commands added by the user.
@@ -65,12 +76,18 @@ module.exports = class GitHubFetcher {
 				console.log(req.body.pusher.name + ' (' + req.body.pusher.email + ') has pushed to master branch:');
 				
 				//Log the commit message if available
-				if(req.body.commits.length > 0) {
+				if (req.body.commits.length > 0) {
 					console.log('Commit: "' + req.body.commits[0].message + '"');
 				}
 
-				//Clone the project to -C ~/*this.localRepoTarget*
-				exec('git clone -C ~/' + options.repoAddress + ' ' + options.localRepoTarget, execCallback);
+				// reset any changes that have been made locally
+				exec('git -C ~/' + options.localRepoTarget + ' reset --hard', execCallback);
+
+				// and ditch any files that have been added locally too
+				exec('git -C ~/' + options.localRepoTarget + ' clean -df', execCallback);
+
+				// now pull down the latest
+				exec('git -C ~/' + options.localRepoTarget + ' pull -f', execCallback);
 
 				//Execute user defined commands
 				for (var i=0; i<options.buildCommands.length; i++) {
