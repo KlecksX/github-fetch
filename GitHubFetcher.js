@@ -40,6 +40,7 @@ module.exports = class GitHubFetcher {
 		if (typeof options == 'undefined') options = {};
 		if (!options.repoAddress) throw new Exception('No repoAddress defined.');
 		if (!options.buildCommands) options.buildCommands = new Array();
+		if (!options.localRepoTarget) options.localRepoTarget = '~/test';
 
 		var execCallback = function (error, stdout, stderr) {
 			if (error) {
