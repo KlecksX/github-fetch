@@ -34,7 +34,10 @@ app.get('/payload', function(req, res) {
 });
 
 app.post('/payload', githubFetcher.endpoint({
-		repoAddress: 'https://github.com/KlecksX/github-fetch.git'
+		repoAddress: 'https://github.com/KlecksX/github-fetch.git',
+		buildCommands: [
+			'npm -C ~/test install --production'
+		]
 	})
 );
 
