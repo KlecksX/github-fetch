@@ -15,7 +15,7 @@ module.exports = class GitHubFetcher {
 	 */
 	signatureCheck (req, res, next) {
 		//TODO: Add proper secret from an Environment Variable
-		var hmac = crypto.createHmac('sha1', 'test-secret');
+		var hmac = crypto.createHmac('sha1', this.secret);
 		hmac.update(JSON.stringify(req.body));
 		var calculatedSignature = 'sha1=' + hmac.digest('hex');
 
