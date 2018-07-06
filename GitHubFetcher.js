@@ -7,6 +7,7 @@ module.exports = class GitHubFetcher {
 
 	constructor(repoAddress) {
 		this.repoAddress = repoAddress;
+		this.buildCommands = new Array();
 	}
 
 	/**
@@ -44,13 +45,26 @@ module.exports = class GitHubFetcher {
 				console.log('Commit: "' + req.body.commits[0].message + '"');
 			}
 			
-			//Fetch, Build and run the project
+			//Clone the project
 			exec(`git clone ${this.repoAddress} test`, execCallback);
+
+			//Execute user defined commands
+			for (var i=0; i<this.buildCommands.length; i++) {
+				exec(this.buildCommands[i], execCallback);
+			}
 
 			return res.sendStatus(200);
 		}
 
 		res.status(400).send('Request body is lacking a valid pusher object.');
+	}
+
+	addBuildCommand(buildCommand) {
+		this.buildCommands.push(buildCommand);
+	}
+
+	addBuildCommands(buildCommands) {
+		this.buildCommands.concat(buildCommands);
 	}
 
 	execCallback(error, stdout, stderr) {
