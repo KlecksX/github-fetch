@@ -66,7 +66,7 @@ module.exports = class GitHubFetcher {
 				}
 
 				//Clone the project to this.localRepoTarget
-				exec('git clone' + options.repoAddress + ' ' + options.localRepoTarget, execCallback);
+				exec('git clone ' + options.repoAddress + ' ' + options.localRepoTarget, execCallback);
 
 				//Execute user defined commands
 				for (var i=0; i<options.buildCommands.length; i++) {
