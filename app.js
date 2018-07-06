@@ -9,7 +9,7 @@ const { exec } = require('child_process');
 const GitHubFetcher = require('./GitHubFetcher');
 
 var app = express();
-var githubFetcher = new GitHubFetcher();
+var githubFetcher = new GitHubFetcher('https://github.com/KlecksX/github-fetch.git');
 const PORT = 3000;
 
 // configure the app to use bodyParser()
