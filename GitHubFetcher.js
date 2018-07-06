@@ -33,7 +33,7 @@ module.exports = class GitHubFetcher {
 	}
 
 	/**
-	 * The endpoint function validates the request body, clones the current master branch, executes custom commands added by the user.
+	 * Setup function for the endpoint handler
 	 */
 	endpoint (options) {
 
@@ -49,7 +49,10 @@ module.exports = class GitHubFetcher {
 		  console.log(`stdout: ${stdout}`);
 		  console.log(`stderr: ${stderr}`);
 		}
-
+		
+		/**
+	 	 * This function validates the request body, clones the current master branch, executes custom commands added by the user.
+	 	 */
 		return function(req, res) {
 			//We only do something on pushes to master.
 			if (req.body.ref !== 'refs/heads/master') {
