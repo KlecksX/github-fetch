@@ -19,12 +19,12 @@ app.use(bodyParser.urlencoded({
 
 app.use(bodyParser.json());
 
-//Middleware to verify that the signature is valid.
-app.use(githubFetcher.signatureCheck);
-
 app.get('/', function(req, res) {
 	res.send("The webhook is listening for changes on /payload.");
 });
+
+//Middleware to verify that the signature is valid.
+app.use('/payload', githubFetcher.signatureCheck);
 
 app.get('/payload', function(req, res) {
 	res.send("The webhook is listening for changes.");
