@@ -30,7 +30,9 @@ app.get('/payload', function(req, res) {
 	res.send("The webhook is listening for changes.");
 });
 
-app.post('/payload', githubFetcher.endpoint);
+app.post('/payload', function(req, res) {
+	githubFetcher.endpoint(req, res);
+});
 
 app.listen(PORT);
 
