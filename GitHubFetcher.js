@@ -7,6 +7,9 @@ module.exports = class GitHubFetcher {
 		this.repoAddress = repoAddress;
 	}
 
+	/**
+	 * The signatureCheck middleware validates the signature in the request sent by GitHub
+	 */
 	signatureCheck (req, res, next) {
 		//TODO: Add proper secret from an Environment Variable
 		hmac = crypto.createHmac('sha1', 'test-secret');
@@ -21,7 +24,9 @@ module.exports = class GitHubFetcher {
 		}
 	}
 
-
+	/**
+	 * The endpoint function validates the request body, clones the current master branch, executes custom commands added by the user.
+	 */
 	endpoint (req, res) {
 		//We only do something on pushes to master.
 		if (req.body.ref !== 'refs/heads/master') {
