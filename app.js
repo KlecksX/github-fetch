@@ -1,3 +1,5 @@
+"use strict";
+
 const express = require('express');
 const bodyParser = require('body-parser');
 
@@ -6,9 +8,9 @@ const { exec } = require('child_process');
 
 const GitHubFetcher = require('./GitHubFetcher');
 
-app = express();
-githubFetcher = new GitHubFetcher();
-PORT = 3000;
+var app = express();
+var githubFetcher = new GitHubFetcher();
+const PORT = 3000;
 
 // configure the app to use bodyParser()
 app.use(bodyParser.urlencoded({

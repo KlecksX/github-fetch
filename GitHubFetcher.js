@@ -1,3 +1,5 @@
+"use strict";
+
 const crypto = require('crypto');
 const { exec } = require('child_process');
 
@@ -12,7 +14,7 @@ module.exports = class GitHubFetcher {
 	 */
 	signatureCheck (req, res, next) {
 		//TODO: Add proper secret from an Environment Variable
-		hmac = crypto.createHmac('sha1', 'test-secret');
+		var hmac = crypto.createHmac('sha1', 'test-secret');
 		hmac.update(JSON.stringify(req.body));
 		calculatedSignature = 'sha1=' + hmac.digest('hex');
 
