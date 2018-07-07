@@ -9,7 +9,7 @@ const { exec } = require('child_process');
 const GitHubFetcher = require('./GitHubFetcher');
 
 var app = express();
-var githubFetcher = new GitHubFetcher();
+var githubFetcher = new GitHubFetcher('https://github.com/KlecksX/github-fetch.git', 'test');
 const PORT = process.env.PORT || 3000;
 
 // configure the app to use bodyParser()
@@ -33,15 +33,10 @@ app.get('/payload', function(req, res) {
 	res.send("The webhook is listening for changes.");
 });
 
-app.post('/payload', githubFetcher.endpoint({
-		repoAddress: 'https://github.com/KlecksX/github-fetch.git',
-		buildCommands: [
-			'npm -C ~/test install --production',
-			'PORT=3001 npm start'
-		],
-		localRepoTarget: 'test'
-	})
-);
+githubFetcher.addBuildCommands([
+]);
+
+app.post('/payload', githubFetcher.endpoint());
 
 app.listen(PORT);
 

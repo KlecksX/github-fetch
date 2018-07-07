@@ -6,21 +6,21 @@ const fs = require('fs');
 
 module.exports = class GitHubFetcher {
 
-	constructor () {}
+	constructor (repoAddress, localRepoTarget='test', githubSecret='test-secret') {
+		if (!repoAddress) throw new Exception('No repoAddress defined.');
+		
+		this.buildCommands = new Array();
+		
+		this.repoAddress = repoAddress;
+		this.localRepoTarget = localRepoTarget;
+	}
 
 	/**
 	 * The signatureCheck middleware validates the signature in the request sent by GitHub
 	 */
-	signatureMiddleware (options) { 
-
-		if (typeof options == 'undefined') options = {};
-
-		if (typeof options.secret == 'undefined') {
-			options.secret = 'test-secret';
-		}
-
+	signatureMiddleware () { 
 		return function (req, res, next) {
-			var hmac = crypto.createHmac('sha1', options.secret);
+			var hmac = crypto.createHmac('sha1', this.githubSecret);
 			hmac.update(JSON.stringify(req.body));
 			var calculatedSignature = 'sha1=' + hmac.digest('hex');
 
@@ -36,12 +36,7 @@ module.exports = class GitHubFetcher {
 	/**
 	 * Setup function for the endpoint handler
 	 */
-	endpoint (options) {
-
-		if (typeof options == 'undefined') options = {};
-		if (!options.repoAddress) throw new Exception('No repoAddress defined.');
-		if (!options.buildCommands) options.buildCommands = new Array();
-		if (!options.localRepoTarget) options.localRepoTarget = 'test';
+	endpoint () {
 
 		var execCallback = function (error, stdout, stderr) {
 			if (error) {
@@ -53,19 +48,19 @@ module.exports = class GitHubFetcher {
 		}
 
 		console.log('Trying to clone the repo. This will fail if the repo has already exists on this machine.')
-		console.log('Executing: git clone ' + options.repoAddress + ' ~/' + options.localRepoTarget);
-		exec('git clone ' + options.repoAddress + ' ~/' + options.localRepoTarget, execCallback);
+		console.log('Executing: git clone ' + this.repoAddress + ' ~/' + this.localRepoTarget);
+		exec('git clone ' + this.repoAddress + ' ~/' + this.localRepoTarget, execCallback);
 		
 		//Execute user defined commands
-		console.log('Executing user defined commands.');
-		for (var i=0; i<options.buildCommands.length; i++) {
-			exec(options.buildCommands[i], execCallback);
+		for (var i=0; i<this.buildCommands.length; i++) {
+			exec(this.buildCommands[i], execCallback);
 		}
 		
 		/**
 	 	 * This function validates the request body, clones the current master branch, executes custom commands added by the user.
 	 	 */
 		return function(req, res) {
+			console.log('This is ' + JSON.stringify(this.buildCommands));
 			//We only do something on pushes to master.
 			if (req.body.ref !== 'refs/heads/master') {
 				return res.send('Push was not to master branch. Will be ignored.');
@@ -81,17 +76,17 @@ module.exports = class GitHubFetcher {
 				}
 
 				// reset any changes that have been made locally
-				exec('git -C ~/' + options.localRepoTarget + ' reset --hard', execCallback);
+				exec('git -C ~/' + this.localRepoTarget + ' reset --hard', execCallback);
 
 				// and ditch any files that have been added locally too
-				exec('git -C ~/' + options.localRepoTarget + ' clean -df', execCallback);
+				exec('git -C ~/' + this.localRepoTarget + ' clean -df', execCallback);
 
 				// now pull down the latest
-				exec('git -C ~/' + options.localRepoTarget + ' pull -f', execCallback);
+				exec('git -C ~/' + this.localRepoTarget + ' pull -f', execCallback);
 
 				//Execute user defined commands
-				for (var i=0; i<options.buildCommands.length; i++) {
-					exec(options.buildCommands[i], execCallback);
+				for (var i=0; i<this.buildCommands.length; i++) {
+					exec(this.buildCommands[i], execCallback);
 				}
 
 				return res.sendStatus(200);
@@ -105,7 +100,7 @@ module.exports = class GitHubFetcher {
 		this.buildCommands.push(buildCommand);
 	}
 
-	addBuildCommands(buildCommands) {
-		this.buildCommands.concat(buildCommands);
+	addBuildCommands(newBuildCommands) {
+		this.buildCommands = this.buildCommands.concat(newBuildCommands);
 	}
 };
