@@ -13,12 +13,13 @@ module.exports = class GitHubFetcher {
 		
 		this.repoAddress = repoAddress;
 		this.localRepoTarget = localRepoTarget;
+		this.githubSecret = githubSecret;
 	}
 
 	/**
 	 * The signatureCheck middleware validates the signature in the request sent by GitHub
 	 */
-	signatureMiddleware () { 
+	signatureMiddleware () {
 		return function (req, res, next) {
 			var hmac = crypto.createHmac('sha1', this.githubSecret);
 			hmac.update(JSON.stringify(req.body));
@@ -38,29 +39,19 @@ module.exports = class GitHubFetcher {
 	 */
 	endpoint () {
 
-		var execCallback = function (error, stdout, stderr) {
-			if (error) {
-		    console.error(`exec error: ${error}`);
-		    return;
-		  }
-		  if (stdout) console.log(`stdout: ${stdout}`);
-		  if (stderr) console.log(`stderr: ${stderr}`);
-		}
-
 		console.log('Trying to clone the repo. This will fail if the repo has already exists on this machine.')
 		console.log('Executing: git clone ' + this.repoAddress + ' ~/' + this.localRepoTarget);
-		exec('git clone ' + this.repoAddress + ' ~/' + this.localRepoTarget, execCallback);
+		exec('git clone ' + this.repoAddress + ' ~/' + this.localRepoTarget, this.execCallback);
 		
 		//Execute user defined commands
 		for (var i=0; i<this.buildCommands.length; i++) {
-			exec(this.buildCommands[i], execCallback);
+			exec(this.buildCommands[i], this.execCallback);
 		}
 		
 		/**
 	 	 * This function validates the request body, clones the current master branch, executes custom commands added by the user.
 	 	 */
 		return function(req, res) {
-			console.log('This is ' + JSON.stringify(this.buildCommands));
 			//We only do something on pushes to master.
 			if (req.body.ref !== 'refs/heads/master') {
 				return res.send('Push was not to master branch. Will be ignored.');
@@ -76,17 +67,17 @@ module.exports = class GitHubFetcher {
 				}
 
 				// reset any changes that have been made locally
-				exec('git -C ~/' + this.localRepoTarget + ' reset --hard', execCallback);
+				exec('git -C ~/' + this.localRepoTarget + ' reset --hard', this.execCallback);
 
 				// and ditch any files that have been added locally too
-				exec('git -C ~/' + this.localRepoTarget + ' clean -df', execCallback);
+				exec('git -C ~/' + this.localRepoTarget + ' clean -df', this.execCallback);
 
 				// now pull down the latest
-				exec('git -C ~/' + this.localRepoTarget + ' pull -f', execCallback);
+				exec('git -C ~/' + this.localRepoTarget + ' pull -f', this.execCallback);
 
 				//Execute user defined commands
 				for (var i=0; i<this.buildCommands.length; i++) {
-					exec(this.buildCommands[i], execCallback);
+					exec(this.buildCommands[i], this.execCallback);
 				}
 
 				return res.sendStatus(200);
@@ -94,6 +85,15 @@ module.exports = class GitHubFetcher {
 		}
 
 		res.status(400).send('Request body is lacking a valid pusher object.');
+	}
+
+	execCallback (error, stdout, stderr) {
+		if (error) {
+	    console.error(`exec error: ${error}`);
+	    return;
+	  }
+	  if (stdout) console.log(`stdout: ${stdout}`);
+	  if (stderr) console.log(`stderr: ${stderr}`);
 	}
 
 	addBuildCommand(buildCommand) {
