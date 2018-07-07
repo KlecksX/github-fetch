@@ -10,7 +10,9 @@
   "author": "Vincent Jeltsch",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.16.3"
+    "cheerio": "^1.0.0-rc.2",
+    "express": "^4.16.3",
+    "request": "^2.87.0"
   },
   "devDependencies": {
     "ngrok": "^3.0.1",
